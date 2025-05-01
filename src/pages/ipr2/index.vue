@@ -4,15 +4,15 @@ import { ref, onMounted } from 'vue'
 const canvas = ref<HTMLCanvasElement | null>(null)
 const canvas1 = ref<HTMLCanvasElement | null>(null)
 
-// Управление скоростями по X и Y (по умолчанию 10)
-const deltaX = ref(10)
-const deltaY = ref(10)
+// Управление скоростями по X и Y (по умолчанию 5)
+const deltaX = ref(5)
+const deltaY = ref(5)
 
 // Количество кадров перемещения (по умолчанию 60)
 const stepCount = ref<number>(60)
 
-// Таймаут движения анимании
-const timeout = ref<number>(300)
+// Таймаут движения анимании (по умолчанию 100)
+const timeout = ref<number>(100)
 
 // Цвет заливки фигуры
 const fillColor = 'rgba(191, 164, 245, 0.72)'
@@ -80,6 +80,58 @@ function drawPolygon(currentX: number, currentY: number, scale: number, color = 
 
   // Заливаем многоугольник
   ctx.fill()
+}
+
+// Отрисовка отсекающей фигуры и фона вокруг неё
+function drawOuterCanvas() {
+  if (!canvas.value || !canvas1.value) return
+
+  ctx = canvas.value.getContext('2d')!
+  ctx1 = canvas1.value.getContext('2d')!
+
+  W.value = canvas.value.width = canvas1.value.width = window.innerWidth
+  H.value = canvas.value.height = canvas1.value.height = window.innerHeight
+
+  // Отсекающее окно
+  ctx1.beginPath()
+  ctx1.fillStyle = 'rgba(255, 173, 15, 0.1)' // бежевый фон
+  ctx1.moveTo(550, 285)
+
+  ctx1.lineTo(625, 285)
+  ctx1.lineTo(625, 415)
+  ctx1.lineTo(710, 415)
+  ctx1.lineTo(710, 285)
+  ctx1.lineTo(785, 285)
+  ctx1.lineTo(785, 485)
+  ctx1.lineTo(550, 485)
+  ctx1.lineTo(550, 285)
+
+  ctx1.fill()
+  ctx1.strokeStyle = 'rgba(0, 0, 0, 0.5)'
+  ctx1.lineWidth = 1
+  ctx1.stroke()
+
+  // Внешняя область вокруг отсекающей фигуры
+  ctx1.beginPath()
+  ctx1.fillStyle = 'rgba(255, 255, 255, 1)' // белый фон
+  ctx1.moveTo(0, 0)
+  ctx1.lineTo(0, H.value)
+  ctx1.lineTo(550, H.value)
+
+  ctx1.lineTo(550, 285)
+  ctx1.lineTo(625, 285)
+  ctx1.lineTo(625, 415)
+  ctx1.lineTo(710, 415)
+  ctx1.lineTo(710, 285)
+  ctx1.lineTo(785, 285)
+  ctx1.lineTo(785, 485)
+  ctx1.lineTo(550, 485)
+  ctx1.lineTo(550, 285)
+
+  ctx1.lineTo(550, H.value)
+  ctx1.lineTo(W.value, H.value)
+  ctx1.lineTo(W.value, 0)
+  ctx1.fill()
 }
 
 // Отрисовка фигуры с применением масштаба
@@ -172,55 +224,7 @@ function reset() {
 }
 
 onMounted(() => {
-  if (!canvas.value || !canvas1.value) return
-
-  ctx = canvas.value.getContext('2d')!
-  ctx1 = canvas1.value.getContext('2d')!
-
-  W.value = canvas.value.width = canvas1.value.width = window.innerWidth
-  H.value = canvas.value.height = canvas1.value.height = window.innerHeight
-
-  // Отсекающее окно
-  ctx1.beginPath()
-  ctx1.fillStyle = 'rgba(255, 173, 15, 0.1)' // бежевый фон
-  ctx1.moveTo(565, 285)
-
-  ctx1.lineTo(640, 285)
-  ctx1.lineTo(640, 415)
-  ctx1.lineTo(695, 415)
-  ctx1.lineTo(695, 285)
-  ctx1.lineTo(770, 285)
-  ctx1.lineTo(770, 485)
-  ctx1.lineTo(565, 485)
-  ctx1.lineTo(565, 285)
-
-  ctx1.fill()
-  ctx1.strokeStyle = 'rgba(0, 0, 0, 0.5)' // белый фон
-  ctx1.lineWidth = 1
-  ctx1.stroke()
-
-  // Внешняя область вокруг отсекающей фигуры
-  ctx1.beginPath()
-  ctx1.fillStyle = 'rgba(255, 255, 255, 1)'
-  ctx1.moveTo(0, 0)
-  ctx1.lineTo(0, H.value)
-  ctx1.lineTo(565, H.value)
-
-  ctx1.lineTo(565, 285)
-  ctx1.lineTo(640, 285)
-  ctx1.lineTo(640, 415)
-  ctx1.lineTo(695, 415)
-  ctx1.lineTo(695, 285)
-  ctx1.lineTo(770, 285)
-  ctx1.lineTo(770, 485)
-  ctx1.lineTo(565, 485)
-  ctx1.lineTo(565, 285)
-
-  ctx1.lineTo(565, H.value)
-  ctx1.lineTo(W.value, H.value)
-  ctx1.lineTo(W.value, 0)
-  ctx1.fill()
-
+  drawOuterCanvas()
   reset()
 })
 </script>
