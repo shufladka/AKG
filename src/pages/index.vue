@@ -7,7 +7,9 @@ function goToIpr1() {
   router.push('/ipr1')
 }
 
-function goToIpr2() {}
+function goToIpr2() {
+  router.push('/ipr2')
+}
 </script>
 
 <template>

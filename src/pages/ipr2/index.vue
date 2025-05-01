@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
-// Контекст отрисовки 2D
-let canvas2D: CanvasRenderingContext2D
-
-// Ссылка на DOM-элемент canvas
-const canvasRef = ref<HTMLCanvasElement | null>(null)
+const canvas = ref<HTMLCanvasElement | null>(null)
+const canvas1 = ref<HTMLCanvasElement | null>(null)
 
 // Управление скоростями по X и Y (по умолчанию 10)
 const deltaX = ref(10)
@@ -13,6 +10,22 @@ const deltaY = ref(10)
 
 // Количество кадров перемещения (по умолчанию 60)
 const stepCount = ref<number>(60)
+
+// Таймаут движения анимании
+const timeout = ref<number>(300)
+
+// Цвет заливки фигуры
+const fillColor = 'rgba(191, 164, 245, 0.72)'
+
+// Структура информации о следах фигуры
+interface TraceInfo {
+  x: number
+  y: number
+  scale: number
+}
+
+let ctx: CanvasRenderingContext2D
+let ctx1: CanvasRenderingContext2D
 
 // Размеры канваса
 const W = ref(0)
@@ -22,27 +35,14 @@ const H = ref(0)
 let x = 0
 let y = 0
 
-// Цвет заливки фигуры
-const fillColor = 'rgba(191, 164, 245, 0.72)'
-
-// Таймаут движения анимании
-const timeout = ref<number>(300)
-
 // Текущий масштаб фигуры
 let currentScale = 1
 
 // Уменьшение масштаба фигуры на следующем шаге (по умолчанию 1/30) (+ делим на количество кадров) 0.99944445
 const nextScale = 1 - 1 / 30 / stepCount.value
 
-// Структура информации о следах фигуры
-interface TraceInfo {
-  x: number
-  y: number
-  scale: number
-}
-
 // Массив следов фигуры (координаты и масштаб)
-const trails: TraceInfo[] = []
+let trails: TraceInfo[] = []
 
 // Флаг — активна ли анимация
 let isAnimating = ref(false)
@@ -52,42 +52,34 @@ let animateTimeout: number | null = null
 
 // Отрисовка многоугольника
 function drawPolygon(currentX: number, currentY: number, scale: number, color = fillColor) {
-  canvas2D.beginPath()
+  ctx.beginPath()
 
   // Задаём цвет заливки
-  canvas2D.fillStyle = color
+  ctx.fillStyle = color
 
   // ВЕРШИНА 1: верхняя точка в середине
-  canvas2D.moveTo(currentX + 80 * scale, currentY)
+  ctx.moveTo(currentX + 80 * scale, currentY)
 
   // ВЕРШИНА 2: вправо и вниз
-  canvas2D.lineTo(currentX + 160 * scale, currentY + 70 * scale)
+  ctx.lineTo(currentX + 160 * scale, currentY + 70 * scale)
 
   // ВЕРШИНА 3: прямо вниз
-  canvas2D.lineTo(currentX + 160 * scale, currentY + 180 * scale)
+  ctx.lineTo(currentX + 160 * scale, currentY + 180 * scale)
 
   // ВЕРШИНА 4: в центр снизу
-  canvas2D.lineTo(currentX + 80 * scale, currentY + 250 * scale)
+  ctx.lineTo(currentX + 80 * scale, currentY + 250 * scale)
 
   // ВЕРШИНА 5: влево
-  canvas2D.lineTo(currentX, currentY + 180 * scale)
+  ctx.lineTo(currentX, currentY + 180 * scale)
 
   // ВЕРШИНА 6: вверх
-  canvas2D.lineTo(currentX, currentY + 70 * scale)
+  ctx.lineTo(currentX, currentY + 70 * scale)
 
   // Замыкаем обратно к ВЕРШИНЕ 1
-  canvas2D.lineTo(currentX + 80 * scale, currentY)
+  ctx.lineTo(currentX + 80 * scale, currentY)
 
   // Заливаем многоугольник
-  canvas2D.fill()
-}
-
-// Рисование "следа" от фигуры
-function drawTrail(trace: TraceInfo) {
-  drawPolygon(trace.x, trace.y, trace.scale, 'rgba(255,255,255,1)')
-  canvas2D.strokeStyle = 'rgba(0,0,0,0.5)'
-  canvas2D.lineWidth = 1
-  canvas2D.stroke()
+  ctx.fill()
 }
 
 // Отрисовка фигуры с применением масштаба
@@ -151,10 +143,7 @@ function animate() {
       k++
       currentX += stepX
       currentY += stepY
-
-      // Очистка канваса и отрисовка всех следов
-      canvas2D.clearRect(0, 0, W.value, H.value)
-      trails.forEach((trace: TraceInfo) => drawTrail(trace))
+      ctx.clearRect(0, 0, W.value, H.value)
 
       // Отрисовка фигуры в новой точке
       draw(currentX, currentY)
@@ -169,35 +158,78 @@ function animate() {
     }
   }
 
-  // Запуск движения
   moveToPoint()
 }
 
 // Сброс параметров и очистка канваса
 function reset() {
-  x = window.innerWidth / 2
-  y = window.innerHeight / 3
+  x = 700
+  y = 300
   currentScale = 1
   trails.length = 0
-  trails.push({ x, y, scale: currentScale })
-  canvas2D.clearRect(0, 0, W.value, H.value)
+  trails = [{ x, y, scale: currentScale }]
   draw(x, y)
 }
 
-// Инициализация канваса и начальная отрисовка при монтировании компонента
 onMounted(() => {
-  const canvas = canvasRef.value!
-  canvas2D = canvas.getContext('2d')!
-  W.value = canvas.width = window.innerWidth
-  H.value = canvas.height = window.innerHeight
+  if (!canvas.value || !canvas1.value) return
+
+  ctx = canvas.value.getContext('2d')!
+  ctx1 = canvas1.value.getContext('2d')!
+
+  W.value = canvas.value.width = canvas1.value.width = window.innerWidth
+  H.value = canvas.value.height = canvas1.value.height = window.innerHeight
+
+  // Отсекающее окно
+  ctx1.beginPath()
+  ctx1.fillStyle = 'rgba(255, 173, 15, 0.1)' // бежевый фон
+  ctx1.moveTo(565, 285)
+
+  ctx1.lineTo(640, 285)
+  ctx1.lineTo(640, 415)
+  ctx1.lineTo(695, 415)
+  ctx1.lineTo(695, 285)
+  ctx1.lineTo(770, 285)
+  ctx1.lineTo(770, 485)
+  ctx1.lineTo(565, 485)
+  ctx1.lineTo(565, 285)
+
+  ctx1.fill()
+  ctx1.strokeStyle = 'rgba(0, 0, 0, 0.5)' // белый фон
+  ctx1.lineWidth = 1
+  ctx1.stroke()
+
+  // Внешняя область вокруг отсекающей фигуры
+  ctx1.beginPath()
+  ctx1.fillStyle = 'rgba(255, 255, 255, 1)'
+  ctx1.moveTo(0, 0)
+  ctx1.lineTo(0, H.value)
+  ctx1.lineTo(565, H.value)
+
+  ctx1.lineTo(565, 285)
+  ctx1.lineTo(640, 285)
+  ctx1.lineTo(640, 415)
+  ctx1.lineTo(695, 415)
+  ctx1.lineTo(695, 285)
+  ctx1.lineTo(770, 285)
+  ctx1.lineTo(770, 485)
+  ctx1.lineTo(565, 485)
+  ctx1.lineTo(565, 285)
+
+  ctx1.lineTo(565, H.value)
+  ctx1.lineTo(W.value, H.value)
+  ctx1.lineTo(W.value, 0)
+  ctx1.fill()
+
   reset()
 })
 </script>
 
 <template>
   <div class="relative w-screen h-screen overflow-hidden">
-    <!-- Канвас занимает всё пространство сверху до блока параметров -->
-    <canvas ref="canvasRef" id="canvas" class="absolute top-0 left-0 w-full h-full" />
+    <!-- Канвасы -->
+    <canvas ref="canvas" id="canvas" class="absolute top-0 left-0 w-full h-full z-0" />
+    <canvas ref="canvas1" class="absolute top-0 left-0 w-full h-full z-10 pointer-events-none" />
 
     <!-- Параметры анимации -->
     <div
@@ -261,8 +293,4 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Установка высоты канваса */
-canvas {
-  height: 700px;
-}
 </style>
