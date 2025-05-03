@@ -15,12 +15,12 @@ onMounted(() => {
 
   // Координаты точек для построения призмы
   const arrayPoints = [
-    [0, 0, 173], // начальная позиция
-    [0, 0, 0], // первая точка
-    [230, 0, 0], // вторая точка
-    [320, 0, 173], // третья точка
-    [230, 0, 346], // четвертая точка
-    [0, 0, 173], // замыкаем линию
+    [250, 0, 150], // начальная позиция
+    [180.9, 0, 245.1], // первая точка
+    [69.1, 0, 208.8], // вторая точка
+    [69.1, 0, 91.2], // третья точка
+    [180.9, 0, 54.9], // четвертая точка
+    [250, 0, 150], // замыкаем линию
   ]
 
   const arr = Array(5)
@@ -47,7 +47,7 @@ onMounted(() => {
     scene = new THREE.Scene()
 
     const material2 = new THREE.LineDashedMaterial({
-      color: 0xffffff,
+      color: 0x111111,
       dashSize: dash,
       gapSize: 0.00001,
     })
@@ -84,7 +84,7 @@ onMounted(() => {
       canvas.width = 256
       canvas.height = 128
       const ctx = canvas.getContext('2d')
-      ctx.fillStyle = 'white'
+      ctx.fillStyle = 'black'
       ctx.font = '48px Arial'
       ctx.textAlign = 'center'
       ctx.fillText(text, canvas.width / 2, canvas.height / 2)
@@ -104,9 +104,9 @@ onMounted(() => {
 
     for (let i = 0; i < 5; i++) {
       const lineMaterial = new THREE.LineDashedMaterial({
-        color: 0xcbbbee,
-        dashSize: 5,
-        gapSize: 0.0001,
+        color: 0x9d0bff,
+        dashSize: 50,
+        gapSize: 0.01,
         linewidth: 10,
       })
 
@@ -141,17 +141,15 @@ onMounted(() => {
       arrayBottom[i].line.computeLineDistances?.()
       arrayEdges[i].line.computeLineDistances?.()
 
-      // arrayLand[i].line.rotation.y = 0.2
-      // arrayBottom[i].line.rotation.y = 0.2
-      // arrayEdges[i].line.rotation.y = 0.2
-
       scene.add(arrayLand[i].line)
       scene.add(arrayBottom[i].line)
       scene.add(arrayEdges[i].line)
     }
 
-    renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setClearColor(0x111111)
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.setClearColor(new THREE.Color(255, 255, 255))
+    renderer.setClearAlpha(0.8)
+
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
 
