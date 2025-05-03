@@ -176,10 +176,6 @@ onMounted(() => {
       arrayEdges[i].line.rotation.z = rotation
       arrayBottom[i].line.rotation.z = rotation
 
-      // arrayLand[i].line.rotation.y = 0.2
-      // arrayBottom[i].line.rotation.y = 0.2
-      // arrayEdges[i].line.rotation.y = 0.2
-
       arrayLand[i].line.material.gapSize = 0.0001
       arrayEdges[i].line.material.gapSize = 0.0001
       arrayBottom[i].line.material.gapSize = 0.0001
@@ -187,55 +183,81 @@ onMounted(() => {
 
     const range = (start, end) => rotation >= start && rotation < end
 
-    // if (range(0, 1.05) || rotation >= 6.037) {
-    //   arrayLand[0].line.material.gapSize = size
-    //   arrayLand[1].line.material.gapSize = size
-    //   arrayLand[2].line.material.gapSize = size
-    //   arrayEdges[1].line.material.gapSize = size
-    //   arrayEdges[2].line.material.gapSize = size
-    // } else if (range(1.05, 1.38)) {
-    //   arrayLand[0].line.material.gapSize = size
-    //   arrayLand[1].line.material.gapSize = size
-    //   arrayLand[5].line.material.gapSize = size
-    //   arrayEdges[1].line.material.gapSize = size
-    //   arrayEdges[0].line.material.gapSize = size
-    // } else if (range(1.38, 2.13)) {
-    //   arrayLand[0].line.material.gapSize = size
-    //   arrayLand[4].line.material.gapSize = size
-    //   arrayLand[5].line.material.gapSize = size
-    //   arrayEdges[5].line.material.gapSize = size
-    //   arrayEdges[0].line.material.gapSize = size
-    // } else if (range(2.13, 2.9)) {
-    //   arrayLand[3].line.material.gapSize = size
-    //   arrayLand[4].line.material.gapSize = size
-    //   arrayLand[5].line.material.gapSize = size
-    //   arrayEdges[5].line.material.gapSize = size
-    //   arrayEdges[4].line.material.gapSize = size
-    // } else if (range(2.9, 3.65)) {
-    //   arrayBottom[3].line.material.gapSize = size
-    //   arrayBottom[4].line.material.gapSize = size
-    //   arrayBottom[5].line.material.gapSize = size
-    //   arrayEdges[5].line.material.gapSize = size
-    //   arrayEdges[4].line.material.gapSize = size
-    // } else if (range(3.65, 4.42)) {
-    //   arrayBottom[0].line.material.gapSize = size
-    //   arrayBottom[4].line.material.gapSize = size
-    //   arrayBottom[5].line.material.gapSize = size
-    //   arrayEdges[5].line.material.gapSize = size
-    //   arrayEdges[0].line.material.gapSize = size
-    // } else if (range(4.42, 4.75)) {
-    //   arrayBottom[0].line.material.gapSize = size
-    //   arrayBottom[1].line.material.gapSize = size
-    //   arrayBottom[5].line.material.gapSize = size
-    //   arrayEdges[1].line.material.gapSize = size
-    //   arrayEdges[0].line.material.gapSize = size
-    // } else if (range(4.75, 6.037)) {
-    //   arrayBottom[0].line.material.gapSize = size
-    //   arrayBottom[1].line.material.gapSize = size
-    //   arrayBottom[2].line.material.gapSize = size
-    //   arrayEdges[2].line.material.gapSize = size
-    //   arrayEdges[1].line.material.gapSize = size
-    // }
+    if (range(0, 0.75)) {
+      // штрихуем ребра верхнего основания
+      arrayLand[2].line.material.gapSize = size
+      arrayLand[3].line.material.gapSize = size
+
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+    } else if (range(0.75, 0.8)) {
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+    } else if (range(0.8, 1.8)) {
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+
+      // штрихуем ребра нижнего основания
+      arrayBottom[2].line.material.gapSize = size
+      arrayBottom[3].line.material.gapSize = size
+    } else if (range(1.8, 2.35)) {
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра нижнего основания
+      arrayBottom[2].line.material.gapSize = size
+      arrayBottom[3].line.material.gapSize = size
+      arrayBottom[4].line.material.gapSize = size
+    } else if (range(2.35, 2.92)) {
+      // штрихуем боковое ребро
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра нижнего основания
+      arrayBottom[3].line.material.gapSize = size
+      arrayBottom[4].line.material.gapSize = size
+    } else if (range(2.92, 3.94)) {
+      // штрихуем боковое ребро
+      arrayEdges[0].line.material.gapSize = size
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра нижнего основания
+      arrayBottom[0].line.material.gapSize = size
+      arrayBottom[3].line.material.gapSize = size
+      arrayBottom[4].line.material.gapSize = size
+    } else if (range(3.94, 4.92)) {
+      // штрихуем боковое ребро
+      arrayEdges[0].line.material.gapSize = size
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра верхнего основания
+      arrayLand[0].line.material.gapSize = size
+      arrayLand[3].line.material.gapSize = size
+      arrayLand[4].line.material.gapSize = size
+    } else if (range(4.92, 5.5)) {
+      // штрихуем боковое ребро
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра верхнего основания
+      arrayLand[3].line.material.gapSize = size
+      arrayLand[4].line.material.gapSize = size
+    } else if (range(5.5, 6.037)) {
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+      arrayEdges[4].line.material.gapSize = size
+
+      // штрихуем ребра верхнего основания
+      arrayLand[2].line.material.gapSize = size
+      arrayLand[3].line.material.gapSize = size
+      arrayLand[4].line.material.gapSize = size
+    } else if (rotation > 6.037) {
+      // штрихуем боковое ребро
+      arrayEdges[3].line.material.gapSize = size
+
+      // штрихуем ребра верхнего основания
+      arrayLand[2].line.material.gapSize = size
+      arrayLand[3].line.material.gapSize = size
+    }
 
     rotation = rotation >= Math.PI * 2 ? 0 : rotation + 0.005
 
