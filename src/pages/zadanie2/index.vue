@@ -12,14 +12,17 @@ onMounted(() => {
   const arrayLand = Array(5)
   const arrayEdges = Array(5)
   const arrayBottom = Array(5)
+
+  // Координаты точек для построения призмы
   const arrayPoints = [
-    [0, -100, 0],
-    [100, -100, -173],
-    [273, -100, -173],
-    [373, -100, 0],
-    [273, -100, 173],
-    [0, -100, 0],
+    [0, 0, 173], // начальная позиция
+    [0, 0, 0], // первая точка
+    [230, 0, 0], // вторая точка
+    [320, 0, 173], // третья точка
+    [230, 0, 346], // четвертая точка
+    [0, 0, 173], // замыкаем линию
   ]
+
   const arr = Array(5)
 
   let camera, scene, renderer
@@ -138,9 +141,9 @@ onMounted(() => {
       arrayBottom[i].line.computeLineDistances?.()
       arrayEdges[i].line.computeLineDistances?.()
 
-      arrayLand[i].line.rotation.y = 0.2
-      arrayBottom[i].line.rotation.y = 0.2
-      arrayEdges[i].line.rotation.y = 0.2
+      // arrayLand[i].line.rotation.y = 0.2
+      // arrayBottom[i].line.rotation.y = 0.2
+      // arrayEdges[i].line.rotation.y = 0.2
 
       scene.add(arrayLand[i].line)
       scene.add(arrayBottom[i].line)
@@ -175,9 +178,9 @@ onMounted(() => {
       arrayEdges[i].line.rotation.z = rotation
       arrayBottom[i].line.rotation.z = rotation
 
-      arrayLand[i].line.rotation.y = 0.2
-      arrayBottom[i].line.rotation.y = 0.2
-      arrayEdges[i].line.rotation.y = 0.2
+      // arrayLand[i].line.rotation.y = 0.2
+      // arrayBottom[i].line.rotation.y = 0.2
+      // arrayEdges[i].line.rotation.y = 0.2
 
       arrayLand[i].line.material.gapSize = 0.0001
       arrayEdges[i].line.material.gapSize = 0.0001
