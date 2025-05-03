@@ -181,7 +181,6 @@ onMounted(() => {
       arrayBottom[i].line.material.gapSize = 0.0001
     }
 
-    console.log(rotation)
     const range = (start, end) => rotation >= start && rotation < end
 
     if (range(0, 0.75)) {
