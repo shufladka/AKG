@@ -9,19 +9,21 @@ import * as THREE from 'three'
 const container = ref(null)
 
 onMounted(() => {
-  const arrayLand = Array(6)
-  const arrayEdges = Array(6)
-  const arrayBottom = Array(6)
+  const arrayLand = Array(5)
+  const arrayEdges = Array(5)
+  const arrayBottom = Array(5)
+
+  // Координаты точек для построения призмы
   const arrayPoints = [
-    [0, -100, 0],
-    [100, -100, -173],
-    [273, -100, -173],
-    [373, -100, 0],
-    [273, -100, 173],
-    [100, -100, 173],
-    [0, -100, 0],
+    [250, 0, 150], // начальная позиция
+    [180.9, 0, 245.1], // первая точка
+    [69.1, 0, 208.8], // вторая точка
+    [69.1, 0, 91.2], // третья точка
+    [180.9, 0, 54.9], // четвертая точка
+    [250, 0, 150], // замыкаем линию
   ]
-  const arr = Array(6)
+
+  const arr = Array(5)
 
   let camera, scene, renderer
   let rotation = 0
@@ -45,7 +47,7 @@ onMounted(() => {
     scene = new THREE.Scene()
 
     const material2 = new THREE.LineDashedMaterial({
-      color: 0xffffff,
+      color: 0x111111,
       dashSize: dash,
       gapSize: 0.00001,
     })
@@ -82,7 +84,7 @@ onMounted(() => {
       canvas.width = 256
       canvas.height = 128
       const ctx = canvas.getContext('2d')
-      ctx.fillStyle = 'white'
+      ctx.fillStyle = 'black'
       ctx.font = '48px Arial'
       ctx.textAlign = 'center'
       ctx.fillText(text, canvas.width / 2, canvas.height / 2)
@@ -100,11 +102,11 @@ onMounted(() => {
     scene.add(createAxisLabel('Y', new THREE.Vector3(0, 420, 0)))
     scene.add(createAxisLabel('Z', new THREE.Vector3(0, 0, 420)))
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       const lineMaterial = new THREE.LineDashedMaterial({
-        color: 0xcbbbee,
-        dashSize: 5,
-        gapSize: 0.0001,
+        color: 0x9d0bff,
+        dashSize: 50,
+        gapSize: 0.01,
         linewidth: 10,
       })
 
@@ -139,17 +141,15 @@ onMounted(() => {
       arrayBottom[i].line.computeLineDistances?.()
       arrayEdges[i].line.computeLineDistances?.()
 
-      arrayLand[i].line.rotation.y = 0.2
-      arrayBottom[i].line.rotation.y = 0.2
-      arrayEdges[i].line.rotation.y = 0.2
-
       scene.add(arrayLand[i].line)
       scene.add(arrayBottom[i].line)
       scene.add(arrayEdges[i].line)
     }
 
-    renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setClearColor(0x111111)
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.setClearColor(new THREE.Color(255, 255, 255))
+    renderer.setClearAlpha(0.8)
+
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.setSize(window.innerWidth, window.innerHeight)
 
@@ -170,15 +170,15 @@ onMounted(() => {
   function animate() {
     requestAnimationFrame(animate)
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       // задаем ось вращения призмы вокруг оси Z
       arrayLand[i].line.rotation.z = rotation
       arrayEdges[i].line.rotation.z = rotation
       arrayBottom[i].line.rotation.z = rotation
 
-      arrayLand[i].line.rotation.y = 0.2
-      arrayBottom[i].line.rotation.y = 0.2
-      arrayEdges[i].line.rotation.y = 0.2
+      // arrayLand[i].line.rotation.y = 0.2
+      // arrayBottom[i].line.rotation.y = 0.2
+      // arrayEdges[i].line.rotation.y = 0.2
 
       arrayLand[i].line.material.gapSize = 0.0001
       arrayEdges[i].line.material.gapSize = 0.0001
