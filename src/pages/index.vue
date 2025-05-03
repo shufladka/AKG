@@ -10,6 +10,10 @@ function goToIpr1() {
 function goToIpr2() {
   router.push('/ipr2')
 }
+
+function goToZadanie1() {
+  router.push('/zadanie1')
+}
 </script>
 
 <template>
@@ -30,6 +34,13 @@ function goToIpr2() {
           class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded shadow transition"
         >
           Перейти к ИПР2
+        </button>
+
+        <button
+          @click="goToZadanie1"
+          class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 rounded shadow transition"
+        >
+          Перейти к Заданию 1
         </button>
       </div>
     </div>

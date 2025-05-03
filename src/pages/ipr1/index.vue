@@ -2,10 +2,10 @@
 import { onMounted, ref } from 'vue'
 
 // Контекст отрисовки 2D
-let canvas2D: CanvasRenderingContext2D
+let polygon: CanvasRenderingContext2D
 
 // Ссылка на DOM-элемент canvas
-const canvasRef = ref<HTMLCanvasElement | null>(null)
+const polygonCanvas = ref<HTMLCanvasElement | null>(null)
 
 // Управление скоростями по X и Y (по умолчанию 10)
 const deltaX = ref(10)
@@ -52,42 +52,42 @@ let animateTimeout: number | null = null
 
 // Отрисовка многоугольника
 function drawPolygon(currentX: number, currentY: number, scale: number, color = fillColor) {
-  canvas2D.beginPath()
+  polygon.beginPath()
 
   // Задаём цвет заливки
-  canvas2D.fillStyle = color
+  polygon.fillStyle = color
 
   // ВЕРШИНА 1: верхняя точка в середине
-  canvas2D.moveTo(currentX + 80 * scale, currentY)
+  polygon.moveTo(currentX + 80 * scale, currentY)
 
   // ВЕРШИНА 2: вправо и вниз
-  canvas2D.lineTo(currentX + 160 * scale, currentY + 70 * scale)
+  polygon.lineTo(currentX + 160 * scale, currentY + 70 * scale)
 
   // ВЕРШИНА 3: прямо вниз
-  canvas2D.lineTo(currentX + 160 * scale, currentY + 180 * scale)
+  polygon.lineTo(currentX + 160 * scale, currentY + 180 * scale)
 
   // ВЕРШИНА 4: в центр снизу
-  canvas2D.lineTo(currentX + 80 * scale, currentY + 250 * scale)
+  polygon.lineTo(currentX + 80 * scale, currentY + 250 * scale)
 
   // ВЕРШИНА 5: влево
-  canvas2D.lineTo(currentX, currentY + 180 * scale)
+  polygon.lineTo(currentX, currentY + 180 * scale)
 
   // ВЕРШИНА 6: вверх
-  canvas2D.lineTo(currentX, currentY + 70 * scale)
+  polygon.lineTo(currentX, currentY + 70 * scale)
 
   // Замыкаем обратно к ВЕРШИНЕ 1
-  canvas2D.lineTo(currentX + 80 * scale, currentY)
+  polygon.lineTo(currentX + 80 * scale, currentY)
 
   // Заливаем многоугольник
-  canvas2D.fill()
+  polygon.fill()
 }
 
 // Рисование "следа" от фигуры
 function drawTrail(trace: TraceInfo) {
   drawPolygon(trace.x, trace.y, trace.scale, 'rgba(255,255,255,1)')
-  canvas2D.strokeStyle = 'rgba(0,0,0,0.5)'
-  canvas2D.lineWidth = 1
-  canvas2D.stroke()
+  polygon.strokeStyle = 'rgba(0,0,0,0.5)'
+  polygon.lineWidth = 1
+  polygon.stroke()
 }
 
 // Отрисовка фигуры с применением масштаба
@@ -153,7 +153,7 @@ function animate() {
       currentY += stepY
 
       // Очистка канваса и отрисовка всех следов
-      canvas2D.clearRect(0, 0, W.value, H.value)
+      polygon.clearRect(0, 0, W.value, H.value)
       trails.forEach((trace: TraceInfo) => drawTrail(trace))
 
       // Отрисовка фигуры в новой точке
@@ -180,14 +180,14 @@ function reset() {
   currentScale = 1
   trails.length = 0
   trails.push({ x, y, scale: currentScale })
-  canvas2D.clearRect(0, 0, W.value, H.value)
+  polygon.clearRect(0, 0, W.value, H.value)
   draw(x, y)
 }
 
 // Инициализация канваса и начальная отрисовка при монтировании компонента
 onMounted(() => {
-  const canvas = canvasRef.value!
-  canvas2D = canvas.getContext('2d')!
+  const canvas = polygonCanvas.value!
+  polygon = canvas.getContext('2d')!
   W.value = canvas.width = window.innerWidth
   H.value = canvas.height = window.innerHeight
   reset()
@@ -197,7 +197,7 @@ onMounted(() => {
 <template>
   <div class="relative w-screen h-screen overflow-hidden">
     <!-- Канвас занимает всё пространство сверху до блока параметров -->
-    <canvas ref="canvasRef" id="canvas" class="absolute top-0 left-0 w-full h-full" />
+    <canvas ref="polygonCanvas" id="canvas" class="absolute top-0 left-0 w-full h-full" />
 
     <!-- Параметры анимации -->
     <div

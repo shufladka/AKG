@@ -7,9 +7,9 @@ const secondCanvas = ref<HTMLCanvasElement | null>(null)
 let firstPolygon: CanvasRenderingContext2D
 let secondPolygon: CanvasRenderingContext2D
 
-// Управление скоростями по X и Y (по умолчанию 5)
-const deltaX = ref(5)
-const deltaY = ref(5)
+// Управление скоростями по X и Y (по умолчанию 10)
+const deltaX = ref(10)
+const deltaY = ref(10)
 
 // Количество кадров перемещения (по умолчанию 60)
 const stepCount = ref<number>(60)
@@ -92,46 +92,23 @@ function drawOuterCanvas() {
   W.value = firstCanvas.value.width = secondCanvas.value.width = window.innerWidth
   H.value = firstCanvas.value.height = secondCanvas.value.height = window.innerHeight
 
-  // Отсекающее окно
   secondPolygon.beginPath()
-  secondPolygon.fillStyle = 'rgba(255, 173, 15, 0.1)' // бежевый фон
-  secondPolygon.moveTo(550, 285)
 
-  secondPolygon.lineTo(625, 285)
-  secondPolygon.lineTo(625, 415)
-  secondPolygon.lineTo(710, 415)
-  secondPolygon.lineTo(710, 285)
-  secondPolygon.lineTo(785, 285)
-  secondPolygon.lineTo(785, 485)
-  secondPolygon.lineTo(550, 485)
-  secondPolygon.lineTo(550, 285)
+  secondPolygon.fillStyle = 'rgba(255, 255, 255, 1)'
 
+  secondPolygon.moveTo(510, 495)
+  secondPolygon.lineTo(880, 495)
+  secondPolygon.lineTo(787, 360)
+  secondPolygon.lineTo(693, 495)
+  secondPolygon.lineTo(601, 360)
+  secondPolygon.lineTo(787, 360)
+  secondPolygon.lineTo(693, 225)
+  secondPolygon.lineTo(510, 495)
   secondPolygon.fill()
-  secondPolygon.strokeStyle = 'rgba(0, 0, 0, 0.5)'
+
+  secondPolygon.strokeStyle = 'rgba(0, 0, 0, 1)'
   secondPolygon.lineWidth = 1
   secondPolygon.stroke()
-
-  // Внешняя область вокруг отсекающей фигуры
-  secondPolygon.beginPath()
-  secondPolygon.fillStyle = 'rgba(255, 255, 255, 1)' // белый фон
-  secondPolygon.moveTo(0, 0)
-  secondPolygon.lineTo(0, H.value)
-  secondPolygon.lineTo(550, H.value)
-
-  secondPolygon.lineTo(550, 285)
-  secondPolygon.lineTo(625, 285)
-  secondPolygon.lineTo(625, 415)
-  secondPolygon.lineTo(710, 415)
-  secondPolygon.lineTo(710, 285)
-  secondPolygon.lineTo(785, 285)
-  secondPolygon.lineTo(785, 485)
-  secondPolygon.lineTo(550, 485)
-  secondPolygon.lineTo(550, 285)
-
-  secondPolygon.lineTo(550, H.value)
-  secondPolygon.lineTo(W.value, H.value)
-  secondPolygon.lineTo(W.value, 0)
-  secondPolygon.fill()
 }
 
 // Отрисовка фигуры с применением масштаба
