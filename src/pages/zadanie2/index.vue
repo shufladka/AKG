@@ -9,19 +9,18 @@ import * as THREE from 'three'
 const container = ref(null)
 
 onMounted(() => {
-  const arrayLand = Array(6)
-  const arrayEdges = Array(6)
-  const arrayBottom = Array(6)
+  const arrayLand = Array(5)
+  const arrayEdges = Array(5)
+  const arrayBottom = Array(5)
   const arrayPoints = [
     [0, -100, 0],
     [100, -100, -173],
     [273, -100, -173],
     [373, -100, 0],
     [273, -100, 173],
-    [100, -100, 173],
     [0, -100, 0],
   ]
-  const arr = Array(6)
+  const arr = Array(5)
 
   let camera, scene, renderer
   let rotation = 0
@@ -100,7 +99,7 @@ onMounted(() => {
     scene.add(createAxisLabel('Y', new THREE.Vector3(0, 420, 0)))
     scene.add(createAxisLabel('Z', new THREE.Vector3(0, 0, 420)))
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       const lineMaterial = new THREE.LineDashedMaterial({
         color: 0xcbbbee,
         dashSize: 5,
@@ -170,7 +169,7 @@ onMounted(() => {
   function animate() {
     requestAnimationFrame(animate)
 
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 5; i++) {
       // задаем ось вращения призмы вокруг оси Z
       arrayLand[i].line.rotation.z = rotation
       arrayEdges[i].line.rotation.z = rotation
