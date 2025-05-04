@@ -16,6 +16,8 @@
     "@popperjs/core": "^2.11.8",
     "@tailwindcss/forms": "^0.5.10",
     "bootstrap": "^5.3.3",
+    "firebase": "^11.6.1",
+    "firebase-tools": "^14.2.2",
     "pinia": "^3.0.1",
     "pinia-plugin-persistedstate": "^4.2.0",
     "rollup-plugin-visualizer": "^5.14.0",
