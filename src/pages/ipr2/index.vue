@@ -166,21 +166,14 @@ function getRandomValue() {
 function animate() {
   if (!isAnimating.value) return
 
-  let n = 0
   let currentX = x
   let currentY = y
 
   // Генерация случайного сдвига по X в допустимых границах
-  do {
-    n = getRandomValue() * deltaX.value
-  } while (x + n <= 25 || x + n >= W.value - 160)
-  x += n
+  x += getRandomValue() * deltaX.value
 
   // Генерация случайного сдвига по Y в допустимых границах
-  do {
-    n = getRandomValue() * deltaY.value
-  } while (y + n <= 95 || y + n >= H.value - 75)
-  y += n
+  y += getRandomValue() * deltaY.value
 
   // Деление пути на заданное количество шагов
   const stepX = (x - currentX) / stepCount.value
