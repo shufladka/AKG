@@ -1,6 +1,0 @@
-*.json
-*.css
-**/.vscode
-**/coverage
-package.json
-package-lock.json
