@@ -3,6 +3,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "noEmit": false,
+    "skipLibCheck": true,
+    "isolatedModules": false,
+    "strict": false
   }
 }
