@@ -38,51 +38,135 @@ let y = 0
 // Текущий масштаб фигуры
 let currentScale = 1
 
-// Уменьшение масштаба фигуры на следующем шаге (по умолчанию 1/30) (+ делим на количество кадров) 0.99944445
+// Уменьшение масштаба фигуры на следующем шаге и деление на количество кадров
 const nextScale = 1 - 1 / 30 / stepCount.value
 
 // Массив следов фигуры (координаты и масштаб)
 let trails: TraceInfo[] = []
 
-// Флаг — активна ли анимация
+// Флаг активности анимации
 let isAnimating = ref(false)
 
 // Ссылка на таймер setTimeout
 let animateTimeout: number | null = null
 
-// Отрисовка многоугольника
-function drawPolygon(currentX: number, currentY: number, scale: number, color = fillColor) {
-  firstPolygon.beginPath()
+// Коды регионов для алгоритма Коэна-Сазерленда
+const INSIDE = 0 // 0000
+const LEFT = 1 // 0001
+const RIGHT = 2 // 0010
+const BOTTOM = 4 // 0100
+const TOP = 8 // 1000
 
-  // Задаём цвет заливки
-  firstPolygon.fillStyle = color
-
-  // ВЕРШИНА 1: верхняя точка в середине
-  firstPolygon.moveTo(currentX + 80 * scale, currentY)
-
-  // ВЕРШИНА 2: вправо и вниз
-  firstPolygon.lineTo(currentX + 160 * scale, currentY + 70 * scale)
-
-  // ВЕРШИНА 3: прямо вниз
-  firstPolygon.lineTo(currentX + 160 * scale, currentY + 180 * scale)
-
-  // ВЕРШИНА 4: в центр снизу
-  firstPolygon.lineTo(currentX + 80 * scale, currentY + 250 * scale)
-
-  // ВЕРШИНА 5: влево
-  firstPolygon.lineTo(currentX, currentY + 180 * scale)
-
-  // ВЕРШИНА 6: вверх
-  firstPolygon.lineTo(currentX, currentY + 70 * scale)
-
-  // Замыкаем обратно к ВЕРШИНЕ 1
-  firstPolygon.lineTo(currentX + 80 * scale, currentY)
-
-  // Заливаем многоугольник
-  firstPolygon.fill()
+// Отсекающее окно
+const clipRect = {
+  xmin: 550, // левая граница
+  ymin: 285, // верхняя граница
+  xmax: 785, // правая граница
+  ymax: 485, // нижняя граница
 }
 
-// Отрисовка отсекающей фигуры и фона вокруг неё
+// Вычисление линий внутри отсеченной области
+function computeOutCode(x: number, y: number): number {
+  let code = INSIDE
+  if (x < clipRect.xmin) code |= LEFT
+  else if (x > clipRect.xmax) code |= RIGHT
+
+  if (y < clipRect.ymin) code |= TOP
+  else if (y > clipRect.ymax) code |= BOTTOM
+
+  return code
+}
+
+// Алгоритм отсечения линии Коэна-Сазерленда
+function cohenSutherlandClip(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number
+): [number, number, number, number] | null {
+  let outcode0 = computeOutCode(x0, y0)
+  let outcode1 = computeOutCode(x1, y1)
+  let accept = false // по умолчанию линия не проходит отсечение
+
+  while (true) {
+    if (!(outcode0 | outcode1)) {
+      // Если обе точки внутри окна => принимаем весь отрезок
+      accept = true
+      break
+    } else if (outcode0 & outcode1) {
+      // Если обе точки снаружи в одной и той же зоне => отрезок полностью вне окна
+      break
+    } else {
+      // Отрезок частично внутри — требуется отсечение
+      let outcodeOut = outcode0 ? outcode0 : outcode1 // выбираем точку, находящуюся вне окна
+      let x, y
+
+      // Находим точку пересечения с соответствующей стороной окна
+      if (outcodeOut & TOP) {
+        x = x0 + ((x1 - x0) * (clipRect.ymin - y0)) / (y1 - y0)
+        y = clipRect.ymin
+      } else if (outcodeOut & BOTTOM) {
+        x = x0 + ((x1 - x0) * (clipRect.ymax - y0)) / (y1 - y0)
+        y = clipRect.ymax
+      } else if (outcodeOut & RIGHT) {
+        y = y0 + ((y1 - y0) * (clipRect.xmax - x0)) / (x1 - x0)
+        x = clipRect.xmax
+      } else if (outcodeOut & LEFT) {
+        y = y0 + ((y1 - y0) * (clipRect.xmin - x0)) / (x1 - x0)
+        x = clipRect.xmin
+      }
+
+      // Заменяем исходную точку на точку пересечения и пересчитываем ее код
+      if (outcodeOut === outcode0) {
+        x0 = x
+        y0 = y
+        outcode0 = computeOutCode(x0, y0)
+      } else {
+        x1 = x
+        y1 = y
+        outcode1 = computeOutCode(x1, y1)
+      }
+    }
+  }
+
+  return accept ? [x0, y0, x1, y1] : null
+}
+
+// Отрисовка многоугольника с отсечением ребер
+function drawPolygon(currentX: number, currentY: number, scale: number, color = fillColor) {
+  firstPolygon.beginPath()
+  firstPolygon.fillStyle = color
+
+  const points = [
+    [currentX + 80 * scale, currentY],
+    [currentX + 160 * scale, currentY + 70 * scale],
+    [currentX + 160 * scale, currentY + 180 * scale],
+    [currentX + 80 * scale, currentY + 250 * scale],
+    [currentX, currentY + 180 * scale],
+    [currentX, currentY + 70 * scale],
+  ]
+
+  // Добавляем замыкающее ребро
+  points.push(points[0])
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const [x0, y0] = points[i]
+    const [x1, y1] = points[i + 1]
+
+    const clipped = cohenSutherlandClip(x0, y0, x1, y1)
+    if (clipped) {
+      const [cx0, cy0, cx1, cy1] = clipped
+      firstPolygon.moveTo(cx0, cy0)
+      firstPolygon.lineTo(cx1, cy1)
+    }
+  }
+
+  firstPolygon.strokeStyle = color
+  firstPolygon.lineWidth = 2
+  firstPolygon.stroke()
+}
+
+// Отрисовка отсекающей фигуры и фона вокруг нее
 function drawOuterCanvas() {
   if (!firstCanvas.value || !secondCanvas.value) return
 
